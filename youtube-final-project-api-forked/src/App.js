@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useContext, createContext } from "react";
-import YouTube from "react-youtube";
+import React, { useState, useEffect, createContext } from "react";
 import "./styles.css";
 import VideoList from "./Components/VideoList.js";
+
 import Form from "./Components/Form.js";
-import axios from "./axios";
 //#endregion
 export const TitleContext = createContext();
 export const LinkContext = createContext();
@@ -12,7 +11,11 @@ export const EndContext = createContext();
 const App = () => {
   const [videoList, setVideoList] = useState([]);
   const [currentAccount, setCurrentAccount] = useState("");
-
+  // const nftCollection = useNFTCollection(
+  //   "0x94cDDd0f2191F4c84d092713ae9024A9CCd476D4"
+  // );
+  // const { data: nfts } = useNFTs(nftCollection);
+  // const { mutate: mintNFT } = useMintNFT(nftCollection);
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
   const [ended, setEnded] = useState(false);
@@ -38,16 +41,13 @@ const App = () => {
     }
   };
   //#endregion
-  const mintHandler = () => {
-    axios
-      .post("", {
-        title: title,
-        url: url,
-        address: currentAccount,
-      })
-      .then(function (response) {
-        console.log(response);
-      });
+  const mintHandler = async () => {
+    await fetch("http://localhost:9000", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+    });
   };
 
   const connectWallet = async () => {
