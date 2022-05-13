@@ -47,6 +47,7 @@ const App = () => {
       headers: {
         "content-type": "application/json",
       },
+      body: JSON.stringify({ title: title, account: currentAccount, url: url }),
     });
   };
 

@@ -1,7 +1,6 @@
 import React, { useState, useRef, useContext } from "react";
 import { TitleContext } from "../App";
 import { LinkContext } from "../App";
-var getYoutubeTitle = require("get-youtube-title");
 
 const Form = (props) => {
   const videoUrl = useRef();
@@ -17,15 +16,30 @@ const Form = (props) => {
 
     props.addVideo({ url: embedCode });
     //#endregion
-    var regExp =
-      /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-    setUrl(url.href);
-    var match = url.href.match(regExp);
-    const id = match && match[7].length == 11 ? match[7] : false;
+    // var regExp =
+    //   /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+    // setUrl(url.href);
+    // var match = url.href.match(regExp);
+    // const id = match && match[7].length == 11 ? match[7] : false;
+    // console.log(id);
+    // var getYoutubeTitle = require("get-youtube-title");
+    // getYoutubeTitle(id, function (err, title) {
+    //   console.log(title);
+    //   setTitle(title);
+    // });
+    //#endregion
+    // $.getJSON(
+    //   "https://noembed.com/embed",
+    //   { format: "json", url: url.href },
+    //   function (data) {
+    //     console.log(data.title);
+    //   }
+    // );
+    const vidurl = url.href;
 
-    getYoutubeTitle(id, function (err, title) {
-      setTitle(title);
-    });
+    fetch(`https://noembed.com/embed?dataType=json&url=${vidurl}`)
+      .then((res) => res.json())
+      .then((data) => console.log("fetch", data.title));
   };
 
   return (

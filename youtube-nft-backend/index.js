@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { ThirdwebSDK } = require("@3rdweb/sdk");
+const { ThirdwebSDK } = require("@thirdweb-dev/sdk");
 const ethers = require("ethers");
 
 const fs = require("fs");
@@ -34,14 +34,16 @@ function dataUriToURL(dataURI) {
 }
 
 app.post("/", async function (req, res) {
+  console.log(req.body);
   const walletAddress = "0x4fBe07b5c6973d69ED80729e33f47b7Eb3999744";
-  const rpcUrl = "https://polygon-rpc.com";
+  const rpcUrl =
+    "https://rinkeby.infura.io/v3/53cdc3163c6c401395135b9122d92fb9";
   const wallet = new ethers.Wallet(
     PRIVATE_KEY,
     ethers.getDefaultProvider(rpcUrl)
   );
   const sdk = new ThirdwebSDK(wallet);
-  const module = sdk.getNFTModule(
+  const module = sdk.getNFTCollection(
     MODULE_ADDRESS
     // The address of you the module you created in ThirdWeb
   );
@@ -55,7 +57,11 @@ app.post("/", async function (req, res) {
 
   console.log("Hello");
   try {
-    await module.mintTo(walletAddress, nftData);
+    const tx = await module.mintTo(walletAddress, nftData);
+    console.log("Done");
+    const receipt = tx.receipt; // the transaction receipt
+    const tokenId = tx.id; // the id of the NFT minted
+    const nft = await tx.data();
     res.status(200);
   } catch (error) {
     console.log(error);
