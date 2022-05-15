@@ -18,7 +18,10 @@ const App = () => {
   // const { mutate: mintNFT } = useMintNFT(nftCollection);
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
+  const [disabled, setDisabled] = useState(true);
   const [ended, setEnded] = useState(false);
+  const [walletConnected, setWalletConnected] = useState(false);
+  const mintGuide = "Your NFT is being minted";
 
   const checkIfWalletIsConnected = async () => {
     const { ethereum } = window;
@@ -36,12 +39,18 @@ const App = () => {
       const account = accounts[0];
       console.log("Found an authorized account:", account);
       setCurrentAccount(account);
+      setWalletConnected(true);
+      setDisabled(false);
     } else {
       console.log("No authorized account found");
     }
   };
   //#endregion
   const mintHandler = async () => {
+    setEnded(false);
+
+    alert("Your NFT is being minted");
+
     await fetch("http://localhost:9000", {
       method: "POST",
       headers: {
@@ -72,13 +81,23 @@ const App = () => {
        */
       console.log("Connected", accounts[0]);
       setCurrentAccount(accounts[0]);
+      setDisabled(false);
+      // setWalletConnected(true);
     } catch (error) {
       console.log(error);
     }
   };
   //#endregion
+
   const mintNFTContainer = () => (
     <button onClick={mintHandler}>Mint NFT</button>
+  );
+  //#endregion
+  const videoPlayerArea = () => (
+    <div>
+      <Form addVideo={addVideo} />
+      <VideoList videoList={videoList} />
+    </div>
   );
 
   //#endregion
@@ -97,7 +116,7 @@ const App = () => {
 
     console.log("setState video", video);
   };
-  //#endregion
+
   useEffect(() => {
     checkIfWalletIsConnected();
   }, []);
@@ -112,9 +131,11 @@ const App = () => {
             ) : (
               <p>Wallet connected with address {currentAccount}</p>
             )}
-            <Form addVideo={addVideo} />
-            <VideoList videoList={videoList} />
+            {/* {console.log(walletConnected)}
+            {walletConnected ? videoPlayerArea : ""} */}
 
+            <Form addVideo={addVideo} disabled={disabled} />
+            <VideoList videoList={videoList} />
             {ended ? mintNFTContainer() : ""}
             {console.log(ended)}
           </div>
