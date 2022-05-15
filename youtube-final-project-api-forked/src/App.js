@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useContext, createContext } from "react";
-import YouTube from "react-youtube";
+import React, { useState, useEffect, createContext } from "react";
 import "./styles.css";
 import VideoList from "./Components/VideoList.js";
+
 import Form from "./Components/Form.js";
-import axios from "./axios";
 //#endregion
 export const TitleContext = createContext();
 export const LinkContext = createContext();
@@ -12,10 +11,17 @@ export const EndContext = createContext();
 const App = () => {
   const [videoList, setVideoList] = useState([]);
   const [currentAccount, setCurrentAccount] = useState("");
-
+  // const nftCollection = useNFTCollection(
+  //   "0x94cDDd0f2191F4c84d092713ae9024A9CCd476D4"
+  // );
+  // const { data: nfts } = useNFTs(nftCollection);
+  // const { mutate: mintNFT } = useMintNFT(nftCollection);
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
+  const [disabled, setDisabled] = useState(true);
   const [ended, setEnded] = useState(false);
+  const [walletConnected, setWalletConnected] = useState(false);
+  const mintGuide = "Your NFT is being minted";
 
   const checkIfWalletIsConnected = async () => {
     const { ethereum } = window;
@@ -33,21 +39,25 @@ const App = () => {
       const account = accounts[0];
       console.log("Found an authorized account:", account);
       setCurrentAccount(account);
+      setWalletConnected(true);
+      setDisabled(false);
     } else {
       console.log("No authorized account found");
     }
   };
   //#endregion
-  const mintHandler = () => {
-    axios
-      .post("", {
-        title: title,
-        url: url,
-        address: currentAccount,
-      })
-      .then(function (response) {
-        console.log(response);
-      });
+  const mintHandler = async () => {
+    setEnded(false);
+
+    alert("Your NFT is being minted");
+
+    await fetch("http://localhost:9000", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ title: title, account: currentAccount, url: url }),
+    });
   };
 
   const connectWallet = async () => {
@@ -71,13 +81,23 @@ const App = () => {
        */
       console.log("Connected", accounts[0]);
       setCurrentAccount(accounts[0]);
+      setDisabled(false);
+      // setWalletConnected(true);
     } catch (error) {
       console.log(error);
     }
   };
   //#endregion
+
   const mintNFTContainer = () => (
     <button onClick={mintHandler}>Mint NFT</button>
+  );
+  //#endregion
+  const videoPlayerArea = () => (
+    <div>
+      <Form addVideo={addVideo} />
+      <VideoList videoList={videoList} />
+    </div>
   );
 
   //#endregion
@@ -96,7 +116,7 @@ const App = () => {
 
     console.log("setState video", video);
   };
-  //#endregion
+
   useEffect(() => {
     checkIfWalletIsConnected();
   }, []);
@@ -111,9 +131,11 @@ const App = () => {
             ) : (
               <p>Wallet connected with address {currentAccount}</p>
             )}
-            <Form addVideo={addVideo} />
-            <VideoList videoList={videoList} />
+            {/* {console.log(walletConnected)}
+            {walletConnected ? videoPlayerArea : ""} */}
 
+            <Form addVideo={addVideo} disabled={disabled} />
+            <VideoList videoList={videoList} />
             {ended ? mintNFTContainer() : ""}
             {console.log(ended)}
           </div>
